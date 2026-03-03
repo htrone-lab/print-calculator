@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Print Cost Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:auto;overflow:visible;}
+body{
+  --bg:#16167e;
+  --bg-deep:#0f0f5c;
+  --panel:#1c1c90;
+  --surface:#21219e;
+  --border:rgba(124,211,255,.18);
+  --border2:rgba(124,211,255,.30);
+  --text:#f5f7ff;
+  --muted:rgba(235,240,255,.72);
+  --muted2:rgba(220,228,255,.52);
+  --accent:#7cd3ff;
+  --accent-dim:rgba(124,211,255,.13);
+  --accent-glow:rgba(124,211,255,.25);
+  --green:#5de8b0;
+  --sans:'Inter',ui-sans-serif,system-ui,sans-serif;
+  --tight:'Inter Tight',ui-sans-serif,system-ui,sans-serif;
+  --r:10px;
+  --r-lg:14px;
+  font-family:var(--sans);
+  font-size:14px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  background:var(--bg);
+  color:var(--text);
+  padding:24px 20px 32px;
+  width:100%;
+}
+
+.shell{width:100%;max-width:100%;}
+
+/* Header */
+.hdr{margin-bottom:16px;}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;}
+.hdr h1{font-family:var(--tight);font-size:20px;font-weight:800;letter-spacing:-.03em;color:#fff;margin:0;}
+.hdr p{font-size:13px;color:var(--muted);margin-top:3px;}
+
+/* Card */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;}
+
+/* Form */
+.fb{padding:16px;}
+.sl{font-size:10px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px;}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.fi{display:flex;flex-direction:column;gap:3px;}
+.fi label{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding-left:1px;}
+.fi input{
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:8px 10px;font-size:13px;font-family:var(--sans);color:#fff;
+  outline:none;transition:border-color .15s,box-shadow .15s;width:100%;
+}
+.fi input::placeholder{color:var(--muted2);}
+.fi input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+input[type=number]{-moz-appearance:textfield;appearance:textfield;}
+.dv{height:1px;background:var(--border);margin:12px 0;}
+
+/* Footer bar */
+.ff{display:flex;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid var(--border);background:var(--surface);}
+.bcalc{
+  flex:1;background:var(--accent);color:#0a0a50;border:none;border-radius:var(--r);
+  padding:9px 16px;font-family:var(--tight);font-size:13px;font-weight:800;
+  cursor:pointer;transition:opacity .15s,box-shadow .15s;
+}
+.bcalc:hover{opacity:.88;box-shadow:0 4px 18px var(--accent-glow);}
+.bg{
+  background:transparent;color:var(--muted);border:1px solid var(--border2);
+  border-radius:var(--r);padding:9px 14px;font-size:12px;font-weight:500;
+  cursor:pointer;transition:border-color .15s,color .15s;white-space:nowrap;font-family:var(--sans);
+}
+.bg:hover{border-color:var(--accent);color:#fff;}
+.er{font-size:12px;color:#ff8080;padding:6px 16px 0;display:none;}
+
+/* Results */
+#res{display:none;}
+.hero{display:grid;grid-template-columns:1fr 1fr;background:var(--bg-deep);border-bottom:1px solid var(--border);}
+.hc{padding:18px 16px;}
+.hc+.hc{border-left:1px solid var(--border);}
+.hc .lb{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:5px;}
+.hc .vl{font-family:var(--tight);font-size:24px;font-weight:800;letter-spacing:-.04em;line-height:1;}
+.hc.pr .vl{color:var(--accent);}
+.hc.se .vl{color:var(--green);}
+.hc .su{font-size:11px;color:var(--muted);margin-top:4px;}
+
+/* Body */
+.rb{padding:14px 16px;}
+.sr{display:flex;gap:8px;margin-bottom:14px;}
+.sp{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;}
+.sp .lb{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:3px;}
+.sp .vl{font-size:15px;font-weight:700;font-family:var(--tight);letter-spacing:-.02em;color:#fff;}
+.sp .nt{font-size:11px;color:var(--muted2);margin-top:2px;}
+
+/* Breakdown */
+.bd{margin-bottom:14px;}
+.br{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);}
+.br:last-child{border-bottom:none;}
+.br .ct{font-size:12.5px;font-weight:500;flex:1.4;color:var(--text);}
+.br .tr{flex:2;height:3px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;}
+.br .fi2{height:100%;background:var(--accent);border-radius:99px;width:0%;transition:width .5s cubic-bezier(.4,0,.2,1);}
+.br .am{font-size:12px;font-weight:600;min-width:64px;text-align:right;color:var(--text);font-variant-numeric:tabular-nums;}
+
+/* Savings */
+.st{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:14px;}
+.sw{display:grid;grid-template-columns:60px 1fr 1fr;padding:8px 12px;border-bottom:1px solid var(--border);align-items:center;gap:8px;}
+.sw:last-child{border-bottom:none;}
+.sw.hd{background:rgba(0,0,0,.15);}
+.sw.hd span{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);}
+.sw .pc{font-size:13px;font-weight:700;font-family:var(--tight);color:#fff;}
+.sw .sv{font-size:13px;font-weight:600;color:var(--green);font-variant-numeric:tabular-nums;}
+.sw .ns{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;}
+
+/* CTA */
+.ca{
+  background:var(--accent-dim);border:1px solid var(--border2);border-radius:var(--r);
+  padding:12px 14px;display:flex;align-items:center;justify-content:space-between;
+  gap:10px;flex-wrap:wrap;margin-bottom:12px;
+}
+.ca p{font-size:12px;color:var(--text);flex:1;min-width:140px;}
+.ca a{
+  background:var(--accent);color:#0a0a50;text-decoration:none;font-family:var(--tight);
+  font-size:11.5px;font-weight:800;padding:7px 12px;border-radius:7px;
+  white-space:nowrap;transition:opacity .15s;
+}
+.ca a:hover{opacity:.85;}
+
+/* Share */
+.sh{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;}
+.shl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted2);margin-bottom:5px;}
+.sh pre{font-size:10.5px;color:var(--muted);line-height:1.7;white-space:pre-wrap;margin-bottom:8px;font-family:'Courier New',monospace;}
+.sha{display:flex;align-items:center;gap:10px;}
+.cp{font-size:11px;color:var(--green);display:none;}
+
+/* Result footer */
+.rf{
+  padding:10px 16px;border-top:1px solid var(--border);background:var(--surface);
+  display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.rf p{font-size:11px;color:var(--muted2);flex:1;}
+
+/* Animations */
+@keyframes up{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.rb>*{animation:up .25s ease both;}
+.rb>*:nth-child(1){animation-delay:.03s;}
+.rb>*:nth-child(2){animation-delay:.07s;}
+.rb>*:nth-child(3){animation-delay:.11s;}
+.rb>*:nth-child(4){animation-delay:.15s;}
+.rb>*:nth-child(5){animation-delay:.19s;}
+.rb>*:nth-child(6){animation-delay:.22s;}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="hdr">
+    <div class="eyebrow">Cost Estimator</div>
+    <h1>Print Cost Calculator</h1>
+    <p>Estimate annual spend, cost per page, and savings in seconds.</p>
+  </div>
+
+  <!-- INPUTS -->
+  <div id="inp">
+    <div class="card">
+      <div class="fb">
+        <div class="sl">Volume</div>
+        <div class="fg">
+          <div class="fi"><label for="a1">Employees</label><input id="a1" type="number" min="0" step="1" placeholder="e.g. 75"/></div>
+          <div class="fi"><label for="a2">Pages / emp / mo</label><input id="a2" type="number" min="0" step="1" placeholder="e.g. 500"/></div>
+        </div>
+        <div class="fg">
+          <div class="fi"><label for="a3">Color pages %</label><input id="a3" type="number" min="0" max="100" step="1" placeholder="e.g. 15"/></div>
+        </div>
+        <div class="dv"></div>
+        <div class="sl">Cost per page</div>
+        <div class="fg">
+          <div class="fi"><label for="a4">B&amp;W CPP ($)</label><input id="a4" type="number" min="0" step="0.001" placeholder="e.g. 0.05"/></div>
+          <div class="fi"><label for="a5">Color CPP ($)</label><input id="a5" type="number" min="0" step="0.001" placeholder="e.g. 0.14"/></div>
+        </div>
+        <div class="dv"></div>
+        <div class="sl">Fixed &amp; overhead</div>
+        <div class="fg">
+          <div class="fi"><label for="a6">Lease / equip ($/yr)</label><input id="a6" type="number" min="0" step="1" placeholder="e.g. 18,000"/></div>
+          <div class="fi"><label for="a7">Service / maint ($/yr)</label><input id="a7" type="number" min="0" step="1" placeholder="e.g. 6,000"/></div>
+        </div>
+        <div class="fg">
+          <div class="fi"><label for="a8">IT support (hrs/mo)</label><input id="a8" type="number" min="0" step="0.5" placeholder="e.g. 4"/></div>
+          <div class="fi"><label for="a9">IT rate ($/hr)</label><input id="a9" type="number" min="0" step="1" placeholder="e.g. 65"/></div>
+        </div>
+      </div>
+      <div class="er" id="er"></div>
+      <div class="ff">
+        <button class="bcalc" id="bc">Calculate &#8594;</button>
+        <button class="bg" id="br2">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="res">
+    <div class="card">
+      <div class="hero">
+        <div class="hc pr">
+          <div class="lb">Annual Print Spend</div>
+          <div class="vl" id="r1">&#8212;</div>
+          <div class="su">All-in estimate</div>
+        </div>
+        <div class="hc se">
+          <div class="lb">Blended Cost / Page</div>
+          <div class="vl" id="r2">&#8212;</div>
+          <div class="su">Across all pages</div>
+        </div>
+      </div>
+      <div class="rb">
+        <div class="sr">
+          <div class="sp">
+            <div class="lb">Annual Pages</div>
+            <div class="vl" id="r3">&#8212;</div>
+            <div class="nt" id="r4">&#8212;</div>
+          </div>
+          <div class="sp">
+            <div class="lb">Per Employee / Yr</div>
+            <div class="vl" id="r5">&#8212;</div>
+            <div class="nt">Budget allocation</div>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="sl" style="margin-bottom:8px;">Where the money goes</div>
+          <div class="br"><span class="ct">Supplies &amp; usage</span><div class="tr"><div class="fi2" id="bs"></div></div><span class="am" id="r6">&#8212;</span></div>
+          <div class="br"><span class="ct">Lease / equipment</span><div class="tr"><div class="fi2" id="bl"></div></div><span class="am" id="r7">&#8212;</span></div>
+          <div class="br"><span class="ct">Service &amp; maint.</span><div class="tr"><div class="fi2" id="bsv"></div></div><span class="am" id="r8">&#8212;</span></div>
+          <div class="br"><span class="ct">IT support labor</span><div class="tr"><div class="fi2" id="bit"></div></div><span class="am" id="r9">&#8212;</span></div>
+        </div>
+        <div class="sl" style="margin-bottom:8px;">Savings scenarios</div>
+        <div class="st">
+          <div class="sw hd"><span>Cut</span><span>You save</span><span>New spend</span></div>
+          <div class="sw"><span class="pc">10%</span><span class="sv" id="s1">&#8212;</span><span class="ns" id="n1">&#8212;</span></div>
+          <div class="sw"><span class="pc">20%</span><span class="sv" id="s2">&#8212;</span><span class="ns" id="n2">&#8212;</span></div>
+          <div class="sw"><span class="pc">30%</span><span class="sv" id="s3">&#8212;</span><span class="ns" id="n3">&#8212;</span></div>
+        </div>
+        <div class="ca">
+          <p>Want a verified number? A structured assessment uncovers device redundancy, contract gaps, and policy savings.</p>
+          <a href="#">Get a free assessment</a>
+        </div>
+        <div class="sh">
+          <div class="shl">Copy &amp; share</div>
+          <pre id="st2"></pre>
+          <div class="sha">
+            <button class="bg" id="cp2" style="padding:6px 12px;font-size:11.5px;">Copy results</button>
+            <span class="cp" id="cpd">Copied &#10003;</span>
+          </div>
+        </div>
+      </div>
+      <div class="rf">
+        <p>Directional estimate only. Verify with meter reads and invoice history.</p>
+        <button class="bg" id="bk" style="padding:6px 12px;font-size:11.5px;">&#8592; Edit inputs</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+(function(){
+  function mo(n){return isFinite(n)?n.toLocaleString(undefined,{style:"currency",currency:"USD",maximumFractionDigits:0}):"$0";}
+  function m3(n){return isFinite(n)?n.toLocaleString(undefined,{style:"currency",currency:"USD",minimumFractionDigits:3,maximumFractionDigits:3}):"$0.000";}
+  function nu(n){return isFinite(n)?Math.round(n).toLocaleString():"0";}
+  function gv(id){return parseFloat(document.getElementById(id).value||"0");}
+  function st(id,t){document.getElementById(id).textContent=t;}
+  function sb(id,v,t){document.getElementById(id).style.width=(t>0?Math.round(v/t*100):0)+"%";}
+  function se(m){var e=document.getElementById("er");e.style.display="block";e.textContent=m;}
+  function ce(){var e=document.getElementById("er");e.style.display="none";e.textContent="";}
+
+  function showResults(){
+    document.getElementById("inp").style.display="none";
+    document.getElementById("res").style.display="block";
+    notifyHeight();
+  }
+  function showInputs(){
+    document.getElementById("res").style.display="none";
+    document.getElementById("inp").style.display="block";
+    notifyHeight();
+  }
+
+  // Tell parent page the current document height so iframe can resize
+  function notifyHeight(){
+    setTimeout(function(){
+      var h = document.body.scrollHeight;
+      try{ window.parent.postMessage({pccHeight: h}, "*"); }catch(e){}
+    }, 80);
+  }
+
+  function calc(){
+    ce();
+    var e=gv("a1"),p=gv("a2"),c=gv("a3"),b=gv("a4"),o=gv("a5"),
+        l=gv("a6"),s=gv("a7"),h=gv("a8"),r=gv("a9");
+    if([e,p,b,o,l,s,h,r].some(function(v){return v<0;})){se("All fields must be non-negative.");return;}
+    if(c<0||c>100){se("Color % must be between 0 and 100.");return;}
+    if(e===0||p===0){se("Please enter employee count and pages per employee.");return;}
+    var pg=e*p*12,cp=pg*(c/100),bw=pg-cp;
+    var sp=(bw*b)+(cp*o),it=h*r*12,tot=sp+l+s+it;
+    var cpp=pg>0?tot/pg:0,pe=e>0?tot/e:0;
+    st("r1",mo(tot));st("r2",m3(cpp));st("r3",nu(pg));
+    st("r4","Color "+nu(cp)+" \u00b7 B&W "+nu(bw));
+    st("r5",mo(pe));st("r6",mo(sp));st("r7",mo(l));st("r8",mo(s));st("r9",mo(it));
+    st("s1",mo(tot*.1));st("n1",mo(tot*.9));
+    st("s2",mo(tot*.2));st("n2",mo(tot*.8));
+    st("s3",mo(tot*.3));st("n3",mo(tot*.7));
+    setTimeout(function(){sb("bs",sp,tot);sb("bl",l,tot);sb("bsv",s,tot);sb("bit",it,tot);},60);
+    document.getElementById("st2").textContent=
+      "Print Cost Estimate\n----------------------------\n"+
+      "Annual pages: "+nu(pg)+" (Color "+nu(cp)+" | B&W "+nu(bw)+")\n"+
+      "Annual spend: "+mo(tot)+"\nCost per page: "+m3(cpp)+"\nPer employee/yr: "+mo(pe)+"\n\n"+
+      "Savings\n----------------------------\n"+
+      "10% -> Save "+mo(tot*.1)+"  (New: "+mo(tot*.9)+")\n"+
+      "20% -> Save "+mo(tot*.2)+"  (New: "+mo(tot*.8)+")\n"+
+      "30% -> Save "+mo(tot*.3)+"  (New: "+mo(tot*.7)+")";
+    document.getElementById("cpd").style.display="none";
+    showResults();
+  }
+
+  var flds=["a1","a2","a3","a4","a5","a6","a7","a8","a9"];
+  function rst(){flds.forEach(function(k){document.getElementById(k).value="";});ce();}
+  function cop(){
+    var m=document.getElementById("cpd");
+    navigator.clipboard.writeText(document.getElementById("st2").textContent.trim())
+      .then(function(){m.style.display="inline";setTimeout(function(){m.style.display="none";},1800);})
+      .catch(function(){m.textContent="Select and copy manually.";m.style.display="inline";});
+  }
+
+  document.getElementById("bc").addEventListener("click",calc);
+  document.getElementById("br2").addEventListener("click",rst);
+  document.getElementById("bk").addEventListener("click",showInputs);
+  document.getElementById("cp2").addEventListener("click",cop);
+
+  // Fire initial height on load
+  window.addEventListener("load", notifyHeight);
+  notifyHeight();
+})();
+</script>
+</body>
+</html>
